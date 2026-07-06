@@ -236,13 +236,15 @@ def build_bar():
     # --- 電極スロット（ジグザグ直列配線）---
     # x-タワー: ch1 単体リード線スロット／ch2-ch3 ブリッジスロット
     # x+タワー: ch1-ch2 ブリッジスロット／ch3 単体リード線スロット
-    def slot_cut(sign, y0, y1):
+    def slot_cut(sign, ya, yb):
+        y0, y1 = sorted((ya, yb))
         x0 = sign * SLOT_X0
         x1 = sign * SLOT_X1
         return B(x0, x1, y0 - SLOT_W / 2, y1 + SLOT_W / 2,
                  SLOT_Z0, TOWER_TOP + EPS)
 
-    def pocket_cut(sign, y0, y1):
+    def pocket_cut(sign, ya, yb):
+        y0, y1 = sorted((ya, yb))
         x0 = sign * SLOT_X1
         x1 = sign * POCK_X1
         return B(x0, x1, y0 - SLOT_W / 2, y1 + SLOT_W / 2,
