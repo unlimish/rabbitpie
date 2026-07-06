@@ -1,44 +1,45 @@
 #!/usr/bin/env python3
 """
-Rabbit Pie 単4×3 + ON/OFFスイッチ内蔵ケース ジェネレーター（一体型）
-====================================================================
+Rabbit Pie 単4×3 電池ケース ジェネレーター（一体型、2バリエーション）
+======================================================================
 
 okikata.org の Rabbit Pie 背面ケース (case_fix_2026.stl) の下端を延長し、
-単4電池3本（直列 4.5V、ジグザグ配線）と ON/OFF スライドスイッチを
-内蔵する「電池バー」を融合した一体型ケース STL を生成します。
+単4電池3本（直列 4.5V、ジグザグ配線）を内蔵する「電池バー」を融合した
+一体型ケース STL を生成します。2つのバリエーションを出力します:
 
-- 追加の印刷部品なし（蓋なし・リベットなし）。印刷するのはこのケース1個だけ
+  1. stl/case_3AAA_basic.stl
+     電池3本 + ON/OFF電源スイッチのみ。コンパクト版
+  2. stl/case_3AAA_speaker.stl + stl/speaker_lid.stl
+     電池3本 + ON/OFF電源スイッチ + スピーカー用ミュートスイッチ + スピーカー
+     ポケット（着脱式リッド別部品）。スピーカーはリッドを外して脱着できる
+
+共通の特徴:
 - 電池はスナップ保持: チャンネル壁が電池を約220°包み込み、開口を
   電池径より 0.3mm 狭くしてパチンと固定。交換はバネ側へ押してから持ち上げ
 - 3本はジグザグ直列: 隣り合う電池を交互に逆向きに挿入し、両端2箇所の
-  ブリッジ電極で connect、残り2端だけが外部リード線（→スイッチ→ケース内部）
+  ブリッジ電極で接続、残り2端だけが外部リード線
 - 背面はケースと同一平面 → 従来どおり背面を下にした平置き印刷・サポート不要
 - 電極タワーに市販の電池ボックス用電極を上から差し込むだけ。フォーク
   プロング付きタブ（実測 20mm×9mm×0.3mm 程度）も、外壁の貫通スリットから
   プロングを突き出して折り曲げロックできる
-- 左タワー上部（ケースとの接合部すぐ下）に ON/OFF スライドスイッチの
-  ポケットを内蔵（実測 12mm×5mm 程度の市販スライドスイッチを想定）。
-  外側からボディごと差し込むフリクションフィットで、奥の細い配線穴で
-  電池バー内の配線通路（レースウェイ）とつながる
-- スイッチの右側（バー中央部）に小型スピーカーのポケットを内蔵
-  （27×17mm 程度の一般的な楕円形マイクロスピーカーを想定）。前面に
-  グリル（音穴パターン）を設け、奥の配線ダクトでケース内部の左トンネル
-  へ配線を通す。イヤホン未挿入時にスピーカーへ切り替える機能は、
-  Rabbit Pie 本体のイヤホンジャックが「スイッチ付き（挿入検知用の
-  追加ピンがある）」タイプであることが前提 — ジャックの実物を確認のこと
-- リード線はケース底壁を貫通する2本のトンネルで直接内部へ
+- リード線はケース底壁を貫通するトンネルで直接内部へ
+
+speaker バリアントのみの追加要素:
+- 左タワー上部に ON/OFF 電源スイッチ、右タワー上部にスピーカー用ミュート
+  スイッチ（どちらも実測 12mm×5mm 程度の市販小型スライドスイッチを想定）
+- バー中央部に小型スピーカー（27×17mm 程度）用の深いポケット。前面は
+  着脱式リッド（別部品、グリル穴付き）で覆う。リッドは浅いリベート
+  （額縁状の段差）に上下の保持リップでスナップイン
+- イヤホンジャックに挿入検知機能が無い場合の代替として、上記ミュート
+  スイッチで手動でスピーカーを消音する運用を想定
 
 必要な市販部品:
   - 電池ボックス用電極（幅 ~9-10mm・板厚 ~0.3-1.0mm の一般的な板電極。
-    根元に小さな2本足のフォークプロングが付いたタイプ（20mm×9mm×0.3mm
-    程度、コイルばね一体型）にも対応: プロングをタワー外壁の貫通スリット
-    から外へ突き出して折り曲げロックできる）
+    根元に小さな2本足のフォークプロングが付いたタイプにも対応）
       * マイナス側バネ電極 ×1 / プラス側平板電極 ×1（リード線ハンダ付け）
       * 2本連結ブリッジ電極 ×2（無ければ単体電極2枚を銅線で接続）
-  - ON/OFF スライドスイッチ ×1（body 12mm×5mm 程度の一般的な小型スライド
-    スイッチ。使用中のバッテリーボックスから移植したものでも可）
-  - 小型スピーカー ×1（27×17mm 程度、厚み ~4mm、8Ω 0.5-1W の
-    一般的な楕円形マイクロスピーカー）
+  - ON/OFF スライドスイッチ ×1（basic）または ×2（speaker、電源+ミュート）
+  - 小型スピーカー ×1（speaker のみ。27×17mm 程度、8Ω 0.5-1W）
   - リード線 数本 (AWG24-26)
 
 使い方:
@@ -75,7 +76,8 @@ WALL_IN_Y = -32.2        # 底壁内面（実測）
 
 # --- 電池バー ---
 FLOOR_T = 1.6            # チャンネル床（ベッド側）
-TOP_WALL = 22.0          # ケース側〜チャンネル1の間（スイッチ＋スピーカー用の間隔を確保）
+TOP_WALL_BASIC = 17.5    # ケース側〜チャンネル1の間（電源スイッチのみ用）
+TOP_WALL_SPEAKER = 22.0  # 同（電源+ミュートスイッチ＋スピーカー用）
 OUT_WALL = 2.2           # 最終チャンネル外側の壁
 RIB_W = 1.9              # チャンネル間ピッチ余裕（ピッチ = Φ + これ）
 OVERLAP = 0.65           # ケース底壁への食い込み（融合用）
@@ -95,7 +97,7 @@ CHAMFER_F = 1.6          # 前面外周エッジの 45° 面取り
 CHAMFER_T = 1.2          # タワー上端エッジの 45° 面取り
 MOUTH_LEAD = 0.3         # スナップ開口の面取り（入れやすさ）
 
-# --- ON/OFF スライドスイッチ（実測 ~12mm×5mm 相当）---
+# --- ON/OFF スライドスイッチ（実測 ~12mm×5mm 相当。電源用/ミュート用共通）---
 SWITCH_L = 13.0          # ポケット長さ（Y方向、スイッチ長 12mm + 1 クリアランス）
 SWITCH_H = 5.6           # ポケット高さ（Z方向、スイッチ幅 5mm + 0.6 クリアランス）
 SWITCH_D = 4.6           # ボディ収納深さ（X方向、フリクションフィット）
@@ -105,14 +107,19 @@ SWITCH_WIRE_W = 4.0      # ボディ奥の配線用の細い貫通穴（幅）
 SWITCH_WIRE_H = 3.0      # 同（高さ）
 
 # --- 小型スピーカー（実測 ~27mm×17mm 相当の楕円形マイクロスピーカー）---
-SPEAKER_L = 28.0         # ポケット幅（X方向、スピーカー長辺27mm + 1 クリアランス）
-SPEAKER_H = 18.0         # ポケット高さ（Y方向、スピーカー短辺17mm + 1 クリアランス）
-SPEAKER_BODY_D = 4.5     # ボディ収納深さ（Z方向、前面から奥へ）
-SPEAKER_CAP = 1.0        # 前面グリル層の厚み（この層だけ音穴を開ける）
-SPEAKER_MARGIN = 2.0     # スピーカーポケット〜隣接構造の余白
+SPK_HW = 15.0            # ポケット半幅 X（スピーカー長辺27mm + 3クリアランス）
+SPK_HH = 9.0             # ポケット半高 Y（スピーカー短辺17mm + 1クリアランス）
+SPK_BODY_D = 4.5         # ボディ収納深さ Z（前面リッドの奥）
+SPK_MARGIN = 2.0         # スピーカーポケット〜隣接構造の余白
+
+# --- スピーカー着脱式リッド（別部品、スナップイン）---
+LID_T = 1.4              # リッド厚み
+LID_CLR = 0.3            # リッド外周クリアランス
+LIP_D = 1.0              # 保持リップの前後方向の厚み
+LIP_ENGAGE = 2.0         # 保持リップが上下端にかぶる幅
 GRILLE_HOLE_D = 2.0      # グリルの音穴直径
 GRILLE_PITCH = 4.0       # 音穴の間隔（格子状）
-GRILLE_INSET = 2.5       # ポケット外周から音穴パターンまでの余白（保持リム）
+GRILLE_INSET = 2.5       # リッド外周から音穴パターンまでの余白（保持強度確保）
 SPEAKER_WIRE_W = 4.0     # 配線ダクトの幅
 SPEAKER_WIRE_H = 3.0     # 配線ダクトの高さ
 
@@ -125,7 +132,7 @@ TUNNEL_Z = (-2.8, -0.6)
 EPS = 0.05
 
 # ----------------------------------------------------------------------------
-# 導出値
+# 導出値（電池・スロット関連は共通、TOP_WALL に依存しない）
 # ----------------------------------------------------------------------------
 R_CH = (CELL_DIA + CELL_FIT) / 2                   # チャンネル半径 5.45
 AXIS_Z = CASE_BACK_Z + FLOOR_T + R_CH              # 電池軸 z = 3.08
@@ -134,11 +141,6 @@ LIP_Z = AXIS_Z + np.sqrt(R_CH**2 - OPEN_HW**2)     # リップ z
 BAR_FRONT = LIP_Z + 0.5                            # バー前面
 PITCH = CELL_DIA + CELL_FIT + RIB_W                # チャンネルピッチ
 
-CH_Y = [CASE_BOT_Y - TOP_WALL - R_CH - i * PITCH for i in range(N_CELLS)]
-CH1_Y, CH2_Y, CH3_Y = CH_Y                         # 可読性のためのエイリアス
-
-BAR_Y0 = CH_Y[-1] - R_CH - OUT_WALL                # バー下端
-BAR_Y1 = CASE_BOT_Y + OVERLAP                      # バー上端（壁に食い込み）
 BAY_X = CAVITY_LEN / 2                             # 電極面 x = ±24.0
 SLOT_X0, SLOT_X1 = BAY_X, BAY_X + SLOT_T
 POCK_X1 = SLOT_X1 + POCKET_T
@@ -146,21 +148,6 @@ FLOOR_TOP = CASE_BACK_Z + FLOOR_T                  # -2.37
 SLOT_Z0 = FLOOR_TOP - SLOT_SINK                    # -3.17
 TOWER_TOP = SLOT_Z0 + SLOT_DEPTH                   # 9.33
 TOWER_X = BAY_X                                    # タワーは |x| >= 24
-
-SWITCH_Y1 = BAR_Y1 - SWITCH_MARGIN
-SWITCH_Y0 = SWITCH_Y1 - SWITCH_L
-SWITCH_Z1 = SWITCH_Z0 + SWITCH_H
-SWITCH_CY = (SWITCH_Y0 + SWITCH_Y1) / 2
-
-# ケース接合部〜チャンネル1の間の「空白ゾーン」中央にスピーカーを配置
-GAP_Y1 = BAR_Y1 - SPEAKER_MARGIN
-GAP_Y0 = CH1_Y + R_CH + SPEAKER_MARGIN
-SPEAKER_CY = (GAP_Y0 + GAP_Y1) / 2
-assert GAP_Y1 - GAP_Y0 >= SPEAKER_H, \
-    f'gap zone too short for speaker: {GAP_Y1-GAP_Y0:.1f} < {SPEAKER_H}'
-SPEAKER_CX = 0.0
-SPEAKER_Z1 = BAR_FRONT - SPEAKER_CAP           # 本体ポケット前端
-SPEAKER_Z0 = SPEAKER_Z1 - SPEAKER_BODY_D       # 本体ポケット奥端
 
 
 def B(x0, x1, y0, y1, z0, z1):
@@ -214,6 +201,19 @@ def prong_feature(sign, cy):
     return [slot, recess]
 
 
+def switch_pocket_cuts(sign, cy):
+    """ON/OFF スライドスイッチ ポケット（左=電源用 sign=-1／右=ミュート用 sign=1）。
+    外側からボディごとフリクションフィットで挿入。奥は細い配線穴で
+    レースウェイへつながる（ボディが通り抜けない肩=段差になる）"""
+    y0, y1 = cy - SWITCH_L / 2, cy + SWITCH_L / 2
+    z0, z1 = SWITCH_Z0, SWITCH_Z0 + SWITCH_H
+    body = B(sign * (CASE_HX + 1), sign * (CASE_HX - SWITCH_D), y0, y1, z0, z1)
+    wire = B(sign * (CASE_HX - SWITCH_D + EPS), sign * SLOT_X1,
+             cy - SWITCH_WIRE_W / 2, cy + SWITCH_WIRE_W / 2,
+             AXIS_Z - SWITCH_WIRE_H / 2, AXIS_Z + SWITCH_WIRE_H / 2)
+    return [body, wire]
+
+
 def grille_holes(cx, cy, w, h, z0, z1):
     """矩形領域内に格子状の音穴を並べる（外周 GRILLE_INSET は保持リムとして残す）"""
     hw = w / 2 - GRILLE_INSET
@@ -241,42 +241,49 @@ def diff(a, parts):
 
 
 # ----------------------------------------------------------------------------
-# 電池バー
+# 電池バー本体
 # ----------------------------------------------------------------------------
-def build_bar():
+def build_bar(with_speaker):
+    top_wall = TOP_WALL_SPEAKER if with_speaker else TOP_WALL_BASIC
+    ch_y = [CASE_BOT_Y - top_wall - R_CH - i * PITCH for i in range(N_CELLS)]
+    ch1_y, ch2_y, ch3_y = ch_y
+    bar_y0 = ch_y[-1] - R_CH - OUT_WALL
+    bar_y1 = CASE_BOT_Y + OVERLAP
+
+    switch_y1 = bar_y1 - SWITCH_MARGIN
+    switch_cy = switch_y1 - SWITCH_L / 2
+
     # 平面外形: 上側コーナー r1.2（ケースと面一で接合）、下側コーナー r6
     r_small = 1.2
     base = shapely.ops.unary_union([
-        sg.box(-CASE_HX + r_small, BAR_Y0 + CORNER_R,
-               CASE_HX - r_small, BAR_Y1 - r_small),
-        sg.Point(-(CASE_HX - CORNER_R), BAR_Y0 + CORNER_R)
+        sg.box(-CASE_HX + r_small, bar_y0 + CORNER_R,
+               CASE_HX - r_small, bar_y1 - r_small),
+        sg.Point(-(CASE_HX - CORNER_R), bar_y0 + CORNER_R)
           .buffer(CORNER_R - r_small, quad_segs=10),
-        sg.Point(CASE_HX - CORNER_R, BAR_Y0 + CORNER_R)
+        sg.Point(CASE_HX - CORNER_R, bar_y0 + CORNER_R)
           .buffer(CORNER_R - r_small, quad_segs=10),
     ])
     outline = base.buffer(r_small, quad_segs=6, join_style=1)
 
     # 本体（前面 5.5）+ 電極タワー（|x|>=24 を 9.33 まで）
     bar = prism(outline, CASE_BACK_Z, BAR_FRONT)
-    tower_l = prism(sg.box(-CASE_HX - 1, BAR_Y0, -TOWER_X, BAR_Y1)
+    tower_l = prism(sg.box(-CASE_HX - 1, bar_y0, -TOWER_X, bar_y1)
                     .intersection(outline), CASE_BACK_Z, TOWER_TOP)
-    tower_r = prism(sg.box(TOWER_X, BAR_Y0, CASE_HX + 1, BAR_Y1)
+    tower_r = prism(sg.box(TOWER_X, bar_y0, CASE_HX + 1, bar_y1)
                     .intersection(outline), CASE_BACK_Z, TOWER_TOP)
     bar = union([bar, tower_l, tower_r])
 
     cuts = []
 
     # ケースとの接合帯（食い込み部）はリムより上に出さない
-    cuts.append(B(-CASE_HX - 1, CASE_HX + 1, CASE_BOT_Y - 0.001, BAR_Y1 + EPS,
+    cuts.append(B(-CASE_HX - 1, CASE_HX + 1, CASE_BOT_Y - 0.001, bar_y1 + EPS,
                   CASE_RIM_Z, TOWER_TOP + 2))
 
     # --- 電池チャンネル（スナップ保持、3本）---
-    for cy in CH_Y:
+    for cy in ch_y:
         cuts.append(xcyl(R_CH, -BAY_X, BAY_X, cy, AXIS_Z))
-        # スナップ開口（リップから前面へ垂直壁）
         cuts.append(B(-BAY_X, BAY_X, cy - OPEN_HW, cy + OPEN_HW,
                       LIP_Z, BAR_FRONT + EPS))
-        # 開口の面取り（電池を入れやすく）
         cuts.append(B(-BAY_X, BAY_X, cy - OPEN_HW - MOUTH_LEAD,
                       cy + OPEN_HW + MOUTH_LEAD,
                       BAR_FRONT - MOUTH_LEAD, BAR_FRONT + EPS))
@@ -286,78 +293,88 @@ def build_bar():
     # x+タワー: ch1-ch2 ブリッジスロット／ch3 単体リード線スロット
     def slot_cut(sign, ya, yb):
         y0, y1 = sorted((ya, yb))
-        x0 = sign * SLOT_X0
-        x1 = sign * SLOT_X1
+        x0, x1 = sign * SLOT_X0, sign * SLOT_X1
         return B(x0, x1, y0 - SLOT_W / 2, y1 + SLOT_W / 2,
                  SLOT_Z0, TOWER_TOP + EPS)
 
     def pocket_cut(sign, ya, yb):
         y0, y1 = sorted((ya, yb))
-        x0 = sign * SLOT_X1
-        x1 = sign * POCK_X1
+        x0, x1 = sign * SLOT_X1, sign * POCK_X1
         return B(x0, x1, y0 - SLOT_W / 2, y1 + SLOT_W / 2,
                  FLOOR_TOP, TOWER_TOP + EPS)
 
-    cuts.append(slot_cut(-1, CH1_Y, CH1_Y))
-    cuts.append(slot_cut(-1, CH3_Y, CH2_Y))
-    cuts.append(slot_cut(1, CH1_Y, CH2_Y))
-    cuts.append(slot_cut(1, CH3_Y, CH3_Y))
-    cuts.append(pocket_cut(-1, CH1_Y, CH1_Y))
-    cuts.append(pocket_cut(-1, CH3_Y, CH2_Y))
-    cuts.append(pocket_cut(1, CH1_Y, CH2_Y))
-    cuts.append(pocket_cut(1, CH3_Y, CH3_Y))
+    cuts.append(slot_cut(-1, ch1_y, ch1_y))
+    cuts.append(slot_cut(-1, ch3_y, ch2_y))
+    cuts.append(slot_cut(1, ch1_y, ch2_y))
+    cuts.append(slot_cut(1, ch3_y, ch3_y))
+    cuts.append(pocket_cut(-1, ch1_y, ch1_y))
+    cuts.append(pocket_cut(-1, ch3_y, ch2_y))
+    cuts.append(pocket_cut(1, ch1_y, ch2_y))
+    cuts.append(pocket_cut(1, ch3_y, ch3_y))
 
     # --- 配線レースウェイ（左右タワー内、ケース接合部から最終チャンネル
     #     手前まで連続した溝。電極ポケット同士・スイッチ・トンネルを繋ぐ）---
     for sign in (-1, 1):
-        x0 = sign * POCK_X1
-        x1 = sign * SLOT_X1
-        cuts.append(B(x0, x1, BAR_Y1 - EPS, CH_Y[-1] - SLOT_W / 2 - EPS,
+        x0, x1 = sign * POCK_X1, sign * SLOT_X1
+        cuts.append(B(x0, x1, bar_y1 - EPS, ch_y[-1] - SLOT_W / 2 - EPS,
                       FLOOR_TOP, TOWER_TOP + EPS))
 
     # --- フォークプロング固定スリット（左右タワー×各チャンネル）---
-    for cy in CH_Y:
+    for cy in ch_y:
         cuts += prong_feature(-1, cy)
         cuts += prong_feature(1, cy)
 
-    # --- ON/OFF スライドスイッチ ポケット（左タワー上部）---
-    #     外側からボディごとフリクションフィットで挿入。奥は細い配線穴で
-    #     レースウェイへつながる（ボディが通り抜けない肩=段差になる）
-    cuts.append(B(-(CASE_HX + 1), -(CASE_HX - SWITCH_D),
-                  SWITCH_Y0, SWITCH_Y1, SWITCH_Z0, SWITCH_Z1))
-    cuts.append(B(-(CASE_HX - SWITCH_D + EPS), -SLOT_X1,
-                  SWITCH_CY - SWITCH_WIRE_W / 2, SWITCH_CY + SWITCH_WIRE_W / 2,
-                  AXIS_Z - SWITCH_WIRE_H / 2, AXIS_Z + SWITCH_WIRE_H / 2))
+    # --- ON/OFF 電源スイッチ ポケット（左タワー上部）---
+    cuts += switch_pocket_cuts(-1, switch_cy)
 
-    # --- 小型スピーカー ポケット（スイッチの右側、バー中央部）---
-    #     本体ポケットは前面から奥へ、最前面だけグリル（音穴）を残して
-    #     フリクションフィットで挿入。奥の配線ダクトで左トンネルへ接続
-    sp_hw, sp_hh = SPEAKER_L / 2, SPEAKER_H / 2
-    cuts.append(B(SPEAKER_CX - sp_hw, SPEAKER_CX + sp_hw,
-                  SPEAKER_CY - sp_hh, SPEAKER_CY + sp_hh,
-                  SPEAKER_Z0, SPEAKER_Z1 + EPS))
-    cuts += grille_holes(SPEAKER_CX, SPEAKER_CY, SPEAKER_L, SPEAKER_H,
-                         SPEAKER_Z1 - EPS, BAR_FRONT + EPS)
-    # 配線ダクト（L字: スピーカー左端 -> 左トンネルの x 位置 -> トンネルまで）
-    duct_z0, duct_z1 = SPEAKER_Z0 + 1.0, SPEAKER_Z0 + 1.0 + SPEAKER_WIRE_H
-    cuts.append(B(TUNNEL_XL[0] - 1.5, SPEAKER_CX - sp_hw + EPS,
-                  SPEAKER_CY - SPEAKER_WIRE_W / 2, SPEAKER_CY + SPEAKER_WIRE_W / 2,
-                  duct_z0, duct_z1))
-    cuts.append(B(TUNNEL_XL[0] - 1.5, TUNNEL_XL[1] + 1.5,
-                  TUNNEL_Y[1] - EPS, SPEAKER_CY + SPEAKER_WIRE_W / 2,
-                  duct_z0, duct_z1))
+    speaker_cy = None
+    if with_speaker:
+        # --- ミュートスイッチ ポケット（右タワー上部、電源スイッチと対称）---
+        cuts += switch_pocket_cuts(1, switch_cy)
+
+        # --- 小型スピーカー ポケット（バー中央部、着脱式リッドで覆う）---
+        gap_y1 = bar_y1 - SPK_MARGIN
+        gap_y0 = ch1_y + R_CH + SPK_MARGIN
+        speaker_cy = (gap_y0 + gap_y1) / 2
+        assert gap_y1 - gap_y0 >= 2 * SPK_HH, \
+            f'gap zone too short for speaker: {gap_y1-gap_y0:.1f} < {2*SPK_HH}'
+
+        z_lid_in = BAR_FRONT - LID_T
+        z_body_bot = z_lid_in - SPK_BODY_D
+
+        # 深いボディポケット（前面のリッド厚み分は含まない）
+        cuts.append(B(-SPK_HW, SPK_HW, speaker_cy - SPK_HH, speaker_cy + SPK_HH,
+                      z_body_bot, z_lid_in + EPS))
+        # リッドが収まるリベート（外周 LID_CLR 分だけ大きい浅い段差）
+        cuts.append(B(-SPK_HW - LID_CLR, SPK_HW + LID_CLR,
+                      speaker_cy - SPK_HH - LID_CLR, speaker_cy + SPK_HH + LID_CLR,
+                      z_lid_in, BAR_FRONT - LIP_D))
+        # 上下端の保持リップを除いた中央部は前面まで貫通
+        cuts.append(B(-SPK_HW - LID_CLR, SPK_HW + LID_CLR,
+                      speaker_cy - SPK_HH + LIP_ENGAGE,
+                      speaker_cy + SPK_HH - LIP_ENGAGE,
+                      BAR_FRONT - LIP_D, BAR_FRONT + EPS))
+
+        # 配線ダクト（L字: スピーカー左端 -> 左トンネルの x 位置 -> トンネルまで）
+        duct_z0 = z_body_bot + 1.0
+        duct_z1 = duct_z0 + SPEAKER_WIRE_H
+        cuts.append(B(TUNNEL_XL[0] - 1.5, -SPK_HW - LID_CLR + EPS,
+                      speaker_cy - SPEAKER_WIRE_W / 2,
+                      speaker_cy + SPEAKER_WIRE_W / 2, duct_z0, duct_z1))
+        cuts.append(B(TUNNEL_XL[0] - 1.5, TUNNEL_XL[1] + 1.5,
+                      TUNNEL_Y[1] - EPS, speaker_cy + SPEAKER_WIRE_W / 2,
+                      duct_z0, duct_z1))
 
     # --- 面取り ---
-    cuts.append(chamfer_x(-TOWER_X, TOWER_X, BAR_Y0, BAR_FRONT, CHAMFER_F))
+    cuts.append(chamfer_x(-TOWER_X, TOWER_X, bar_y0, BAR_FRONT, CHAMFER_F))
     for sx in (-1, 1):
         cuts.append(chamfer_x(sx * TOWER_X, sx * (CASE_HX + 1),
-                              BAR_Y0, TOWER_TOP, CHAMFER_T))
-        cuts.append(chamfer_y(BAR_Y0 - 1, BAR_Y1 + 1, sx * CASE_HX,
+                              bar_y0, TOWER_TOP, CHAMFER_T))
+        cuts.append(chamfer_y(bar_y0 - 1, bar_y1 + 1, sx * CASE_HX,
                               TOWER_TOP, CHAMFER_T))
-        cuts.append(chamfer_y(BAR_Y0 - 1, BAR_Y1 + 1, sx * CASE_HX,
+        cuts.append(chamfer_y(bar_y0 - 1, bar_y1 + 1, sx * CASE_HX,
                               BAR_FRONT, CHAMFER_T))
-        # タワー内側の段差エッジ
-        cuts.append(chamfer_y(BAR_Y0 - 1, BAR_Y1 + 1, sx * TOWER_X,
+        cuts.append(chamfer_y(bar_y0 - 1, bar_y1 + 1, sx * TOWER_X,
                               TOWER_TOP, CHAMFER_T))
 
     # --- 極性マーク（タワー上面に 0.5 彫り込み）---
@@ -373,16 +390,57 @@ def build_bar():
 
     # ジグザグ配線: ch1 は x+ が+/x- が-、ch2 は逆(x- が+/x+ が-)、
     # ch3 は ch1 と同じ向き
-    cuts += plus(27.7, CH1_Y) + minus(-27.7, CH1_Y)
-    cuts += minus(27.7, CH2_Y) + plus(-27.7, CH2_Y)
-    cuts += plus(27.7, CH3_Y) + minus(-27.7, CH3_Y)
+    cuts += plus(27.7, ch1_y) + minus(-27.7, ch1_y)
+    cuts += minus(27.7, ch2_y) + plus(-27.7, ch2_y)
+    cuts += plus(27.7, ch3_y) + minus(-27.7, ch3_y)
 
-    return bar, cuts
+    info = dict(ch_y=ch_y, bar_y0=bar_y0, bar_y1=bar_y1,
+                switch_cy=switch_cy, speaker_cy=speaker_cy)
+    return bar, cuts, info
+
+
+# ----------------------------------------------------------------------------
+# スピーカー着脱式リッド（別部品）
+# ----------------------------------------------------------------------------
+def build_speaker_lid(speaker_cy):
+    """段付き形状: 中央部は前面(BAR_FRONT)まで達し、上下端の LIP_ENGAGE 幅
+    だけ LIP_D 分薄くして、ケース側の保持リップの下に滑り込むようにする。"""
+    hw, hh = SPK_HW - LID_CLR / 2, SPK_HH - LID_CLR / 2
+    z0, z1 = BAR_FRONT - LID_T, BAR_FRONT
+    center = B(-hw, hw, speaker_cy - (hh - LIP_ENGAGE),
+              speaker_cy + (hh - LIP_ENGAGE), z0, z1)
+    edge_top = B(-hw, hw, speaker_cy + (hh - LIP_ENGAGE), speaker_cy + hh,
+                z0, z1 - LIP_D)
+    edge_bot = B(-hw, hw, speaker_cy - hh, speaker_cy - (hh - LIP_ENGAGE),
+                z0, z1 - LIP_D)
+    lid = union([center, edge_top, edge_bot])
+    holes = grille_holes(0.0, speaker_cy, 2 * hw, 2 * (hh - LIP_ENGAGE),
+                         z0 - EPS, z1 + EPS)
+    lid = diff(lid, holes)
+    # 印刷姿勢: 外面(z1側)を下にする
+    lid.apply_translation([0, -speaker_cy, 0])
+    lid.apply_transform(rotation_matrix(np.pi, [1, 0, 0]))
+    lid.apply_translation([0, 0, -lid.bounds[0][2]])
+    return lid
 
 
 # ----------------------------------------------------------------------------
 # メイン
 # ----------------------------------------------------------------------------
+def build_case(main_body, others, with_speaker):
+    bar, cuts, info = build_bar(with_speaker)
+
+    tunnels = [B(TUNNEL_XL[0], TUNNEL_XL[1], TUNNEL_Y[0], TUNNEL_Y[1],
+                 TUNNEL_Z[0], TUNNEL_Z[1])]
+    if with_speaker:
+        tunnels.append(B(TUNNEL_XR[0], TUNNEL_XR[1], TUNNEL_Y[0], TUNNEL_Y[1],
+                         TUNNEL_Z[0], TUNNEL_Z[1]))
+
+    fused = diff(union([main_body, bar]), cuts + tunnels)
+    out = trimesh.util.concatenate([fused] + list(others))
+    return out, fused, info
+
+
 if __name__ == '__main__':
     import os
     src = sys.argv[1] if len(sys.argv) > 1 else 'stl/case_fix_2026_original.stl'
@@ -392,31 +450,24 @@ if __name__ == '__main__':
     others = parts[1:]                       # コーナーポスト・スナップ爪（無改造）
     assert main_body.is_watertight
 
-    bar, cuts = build_bar()
-
-    # 配線トンネル（メインボディの底壁を貫通させる、左右2本）
-    tunnel_l = B(TUNNEL_XL[0], TUNNEL_XL[1], TUNNEL_Y[0], TUNNEL_Y[1],
-                 TUNNEL_Z[0], TUNNEL_Z[1])
-    tunnel_r = B(TUNNEL_XR[0], TUNNEL_XR[1], TUNNEL_Y[0], TUNNEL_Y[1],
-                 TUNNEL_Z[0], TUNNEL_Z[1])
-
-    fused = diff(union([main_body, bar]), cuts + [tunnel_l, tunnel_r])
-    print('fused main: watertight =', fused.is_watertight,
-          'tris =', len(fused.faces))
-
-    # ポスト・爪はオリジナルのまま同梱（元 STL と同じマルチシェル形式）
-    out = trimesh.util.concatenate([fused] + list(others))
-
     os.makedirs('stl', exist_ok=True)
-    path = 'stl/case_battery_3AAA_switch.stl'
-    out.export(path)
-    b = out.bounds
-    print(f'{path}: size = {np.round(out.extents,2).tolist()}, '
-          f'bounds z = {b[0][2]:.2f}..{b[1][2]:.2f}')
-    fused.export('stl/_fused_main_only.stl')
-    print('bar front z =', round(BAR_FRONT, 2), ' tower top z =',
-          round(TOWER_TOP, 2), ' total height =',
-          round(34.65 + abs(BAR_Y0), 2))
-    print('channels Y =', [round(y, 2) for y in CH_Y])
-    print('switch pocket Y =', round(SWITCH_Y0, 2), '..', round(SWITCH_Y1, 2),
-          ' Z =', round(SWITCH_Z0, 2), '..', round(SWITCH_Z1, 2))
+
+    out, fused, info = build_case(main_body, others, with_speaker=False)
+    print('basic: watertight =', fused.is_watertight, 'tris =', len(fused.faces))
+    out.export('stl/case_3AAA_basic.stl')
+    print(f'  size = {np.round(out.extents,2).tolist()}')
+    print('  channels Y =', [round(y, 2) for y in info['ch_y']])
+
+    out2, fused2, info2 = build_case(main_body, others, with_speaker=True)
+    print('speaker: watertight =', fused2.is_watertight, 'tris =', len(fused2.faces))
+    out2.export('stl/case_3AAA_speaker.stl')
+    print(f'  size = {np.round(out2.extents,2).tolist()}')
+    print('  channels Y =', [round(y, 2) for y in info2['ch_y']])
+    print('  power switch cy =', round(info2['switch_cy'], 2))
+    print('  speaker cy =', round(info2['speaker_cy'], 2))
+
+    lid = build_speaker_lid(info2['speaker_cy'])
+    lid.export('stl/speaker_lid.stl')
+    print('  speaker_lid size =', np.round(lid.extents, 2).tolist())
+
+    fused2.export('stl/_fused_main_only.stl')
