@@ -20,6 +20,12 @@ okikata.org の Rabbit Pie 背面ケース (case_fix_2026.stl) の下端を延�
   ポケットを内蔵（実測 12mm×5mm 程度の市販スライドスイッチを想定）。
   外側からボディごと差し込むフリクションフィットで、奥の細い配線穴で
   電池バー内の配線通路（レースウェイ）とつながる
+- スイッチの右側（バー中央部）に小型スピーカーのポケットを内蔵
+  （27×17mm 程度の一般的な楕円形マイクロスピーカーを想定）。前面に
+  グリル（音穴パターン）を設け、奥の配線ダクトでケース内部の左トンネル
+  へ配線を通す。イヤホン未挿入時にスピーカーへ切り替える機能は、
+  Rabbit Pie 本体のイヤホンジャックが「スイッチ付き（挿入検知用の
+  追加ピンがある）」タイプであることが前提 — ジャックの実物を確認のこと
 - リード線はケース底壁を貫通する2本のトンネルで直接内部へ
 
 必要な市販部品:
@@ -31,6 +37,8 @@ okikata.org の Rabbit Pie 背面ケース (case_fix_2026.stl) の下端を延�
       * 2本連結ブリッジ電極 ×2（無ければ単体電極2枚を銅線で接続）
   - ON/OFF スライドスイッチ ×1（body 12mm×5mm 程度の一般的な小型スライド
     スイッチ。使用中のバッテリーボックスから移植したものでも可）
+  - 小型スピーカー ×1（27×17mm 程度、厚み ~4mm、8Ω 0.5-1W の
+    一般的な楕円形マイクロスピーカー）
   - リード線 数本 (AWG24-26)
 
 使い方:
@@ -67,7 +75,7 @@ WALL_IN_Y = -32.2        # 底壁内面（実測）
 
 # --- 電池バー ---
 FLOOR_T = 1.6            # チャンネル床（ベッド側）
-TOP_WALL = 17.5          # ケース側〜チャンネル1の間（スイッチ用の間隔を確保）
+TOP_WALL = 22.0          # ケース側〜チャンネル1の間（スイッチ＋スピーカー用の間隔を確保）
 OUT_WALL = 2.2           # 最終チャンネル外側の壁
 RIB_W = 1.9              # チャンネル間ピッチ余裕（ピッチ = Φ + これ）
 OVERLAP = 0.65           # ケース底壁への食い込み（融合用）
@@ -95,6 +103,18 @@ SWITCH_Z0 = -0.8         # ポケット下端 Z
 SWITCH_MARGIN = 2.0      # スイッチポケット〜ケース接合部の余白
 SWITCH_WIRE_W = 4.0      # ボディ奥の配線用の細い貫通穴（幅）
 SWITCH_WIRE_H = 3.0      # 同（高さ）
+
+# --- 小型スピーカー（実測 ~27mm×17mm 相当の楕円形マイクロスピーカー）---
+SPEAKER_L = 28.0         # ポケット幅（X方向、スピーカー長辺27mm + 1 クリアランス）
+SPEAKER_H = 18.0         # ポケット高さ（Y方向、スピーカー短辺17mm + 1 クリアランス）
+SPEAKER_BODY_D = 4.5     # ボディ収納深さ（Z方向、前面から奥へ）
+SPEAKER_CAP = 1.0        # 前面グリル層の厚み（この層だけ音穴を開ける）
+SPEAKER_MARGIN = 2.0     # スピーカーポケット〜隣接構造の余白
+GRILLE_HOLE_D = 2.0      # グリルの音穴直径
+GRILLE_PITCH = 4.0       # 音穴の間隔（格子状）
+GRILLE_INSET = 2.5       # ポケット外周から音穴パターンまでの余白（保持リム）
+SPEAKER_WIRE_W = 4.0     # 配線ダクトの幅
+SPEAKER_WIRE_H = 3.0     # 配線ダクトの高さ
 
 # --- 配線トンネル（左右2本、ケース底壁を貫通）---
 TUNNEL_XL = (-19.0, -16.0)
@@ -131,6 +151,16 @@ SWITCH_Y1 = BAR_Y1 - SWITCH_MARGIN
 SWITCH_Y0 = SWITCH_Y1 - SWITCH_L
 SWITCH_Z1 = SWITCH_Z0 + SWITCH_H
 SWITCH_CY = (SWITCH_Y0 + SWITCH_Y1) / 2
+
+# ケース接合部〜チャンネル1の間の「空白ゾーン」中央にスピーカーを配置
+GAP_Y1 = BAR_Y1 - SPEAKER_MARGIN
+GAP_Y0 = CH1_Y + R_CH + SPEAKER_MARGIN
+SPEAKER_CY = (GAP_Y0 + GAP_Y1) / 2
+assert GAP_Y1 - GAP_Y0 >= SPEAKER_H, \
+    f'gap zone too short for speaker: {GAP_Y1-GAP_Y0:.1f} < {SPEAKER_H}'
+SPEAKER_CX = 0.0
+SPEAKER_Z1 = BAR_FRONT - SPEAKER_CAP           # 本体ポケット前端
+SPEAKER_Z0 = SPEAKER_Z1 - SPEAKER_BODY_D       # 本体ポケット奥端
 
 
 def B(x0, x1, y0, y1, z0, z1):
@@ -182,6 +212,24 @@ def prong_feature(sign, cy):
                cy - PRONG_SLOT_W / 2 - 2, cy + PRONG_SLOT_W / 2 + 2,
                AXIS_Z - PRONG_SLOT_H / 2 - 2, AXIS_Z + PRONG_SLOT_H / 2 + 2)
     return [slot, recess]
+
+
+def grille_holes(cx, cy, w, h, z0, z1):
+    """矩形領域内に格子状の音穴を並べる（外周 GRILLE_INSET は保持リムとして残す）"""
+    hw = w / 2 - GRILLE_INSET
+    hh = h / 2 - GRILLE_INSET
+    nx = max(1, int(2 * hw // GRILLE_PITCH) + 1)
+    ny = max(1, int(2 * hh // GRILLE_PITCH) + 1)
+    xs = np.linspace(cx - hw, cx + hw, nx) if nx > 1 else [cx]
+    ys = np.linspace(cy - hh, cy + hh, ny) if ny > 1 else [cy]
+    holes = []
+    for hx in xs:
+        for hy in ys:
+            c = cylinder(radius=GRILLE_HOLE_D / 2, height=z1 - z0 + 2 * EPS,
+                         sections=24)
+            c.apply_translation([hx, hy, (z0 + z1) / 2])
+            holes.append(c)
+    return holes
 
 
 def union(parts):
@@ -280,6 +328,24 @@ def build_bar():
     cuts.append(B(-(CASE_HX - SWITCH_D + EPS), -SLOT_X1,
                   SWITCH_CY - SWITCH_WIRE_W / 2, SWITCH_CY + SWITCH_WIRE_W / 2,
                   AXIS_Z - SWITCH_WIRE_H / 2, AXIS_Z + SWITCH_WIRE_H / 2))
+
+    # --- 小型スピーカー ポケット（スイッチの右側、バー中央部）---
+    #     本体ポケットは前面から奥へ、最前面だけグリル（音穴）を残して
+    #     フリクションフィットで挿入。奥の配線ダクトで左トンネルへ接続
+    sp_hw, sp_hh = SPEAKER_L / 2, SPEAKER_H / 2
+    cuts.append(B(SPEAKER_CX - sp_hw, SPEAKER_CX + sp_hw,
+                  SPEAKER_CY - sp_hh, SPEAKER_CY + sp_hh,
+                  SPEAKER_Z0, SPEAKER_Z1 + EPS))
+    cuts += grille_holes(SPEAKER_CX, SPEAKER_CY, SPEAKER_L, SPEAKER_H,
+                         SPEAKER_Z1 - EPS, BAR_FRONT + EPS)
+    # 配線ダクト（L字: スピーカー左端 -> 左トンネルの x 位置 -> トンネルまで）
+    duct_z0, duct_z1 = SPEAKER_Z0 + 1.0, SPEAKER_Z0 + 1.0 + SPEAKER_WIRE_H
+    cuts.append(B(TUNNEL_XL[0] - 1.5, SPEAKER_CX - sp_hw + EPS,
+                  SPEAKER_CY - SPEAKER_WIRE_W / 2, SPEAKER_CY + SPEAKER_WIRE_W / 2,
+                  duct_z0, duct_z1))
+    cuts.append(B(TUNNEL_XL[0] - 1.5, TUNNEL_XL[1] + 1.5,
+                  TUNNEL_Y[1] - EPS, SPEAKER_CY + SPEAKER_WIRE_W / 2,
+                  duct_z0, duct_z1))
 
     # --- 面取り ---
     cuts.append(chamfer_x(-TOWER_X, TOWER_X, BAR_Y0, BAR_FRONT, CHAMFER_F))
