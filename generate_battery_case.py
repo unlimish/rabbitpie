@@ -123,7 +123,8 @@ GRILLE_INSET = 2.5       # リッド外周から音穴パターンまでの余�
 SPEAKER_WIRE_W = 4.0     # 配線ダクトの幅
 SPEAKER_WIRE_H = 3.0     # 配線ダクトの高さ
 
-# --- 配線トンネル（左右2本、ケース底壁を貫通）---
+# --- 配線トンネル（左右2本、ケース底壁を貫通。ch1/ch3 の外部リード線は
+#     どちらも必ずどこかのトンネルへ抜ける必要があるため両方とも常設）---
 TUNNEL_XL = (-19.0, -16.0)
 TUNNEL_XR = (16.0, 19.0)
 TUNNEL_Y = (-34.4, -30.9)          # 背面プレート上面〜基板ハンダ面の間の帯
@@ -148,6 +149,7 @@ FLOOR_TOP = CASE_BACK_Z + FLOOR_T                  # -2.37
 SLOT_Z0 = FLOOR_TOP - SLOT_SINK                    # -3.17
 TOWER_TOP = SLOT_Z0 + SLOT_DEPTH                   # 9.33
 TOWER_X = BAY_X                                    # タワーは |x| >= 24
+THIN_DUCT_Z = (FLOOR_TOP, FLOOR_TOP + 3.0)          # 最適化版の細い配線ダクト高さ
 
 
 def B(x0, x1, y0, y1, z0, z1):
@@ -210,7 +212,7 @@ def switch_pocket_cuts(sign, cy):
     body = B(sign * (CASE_HX + 1), sign * (CASE_HX - SWITCH_D), y0, y1, z0, z1)
     wire = B(sign * (CASE_HX - SWITCH_D + EPS), sign * SLOT_X1,
              cy - SWITCH_WIRE_W / 2, cy + SWITCH_WIRE_W / 2,
-             AXIS_Z - SWITCH_WIRE_H / 2, AXIS_Z + SWITCH_WIRE_H / 2)
+             THIN_DUCT_Z[0], THIN_DUCT_Z[0] + SWITCH_WIRE_H)
     return [body, wire]
 
 
@@ -243,7 +245,7 @@ def diff(a, parts):
 # ----------------------------------------------------------------------------
 # 電池バー本体
 # ----------------------------------------------------------------------------
-def build_bar(with_speaker):
+def build_bar(with_speaker, optimized=False):
     top_wall = TOP_WALL_SPEAKER if with_speaker else TOP_WALL_BASIC
     ch_y = [CASE_BOT_Y - top_wall - R_CH - i * PITCH for i in range(N_CELLS)]
     ch1_y, ch2_y, ch3_y = ch_y
@@ -312,12 +314,24 @@ def build_bar(with_speaker):
     cuts.append(pocket_cut(1, ch1_y, ch2_y))
     cuts.append(pocket_cut(1, ch3_y, ch3_y))
 
-    # --- 配線レースウェイ（左右タワー内、ケース接合部から最終チャンネル
-    #     手前まで連続した溝。電極ポケット同士・スイッチ・トンネルを繋ぐ）---
-    for sign in (-1, 1):
-        x0, x1 = sign * POCK_X1, sign * SLOT_X1
-        cuts.append(B(x0, x1, bar_y1 - EPS, ch_y[-1] - SLOT_W / 2 - EPS,
-                      FLOOR_TOP, TOWER_TOP + EPS))
+    if not optimized:
+        # --- 配線レースウェイ（左右タワー内、ケース接合部から最終チャンネル
+        #     手前まで連続した溝。電極ポケット同士・スイッチ・トンネルを繋ぐ）---
+        for sign in (-1, 1):
+            x0, x1 = sign * POCK_X1, sign * SLOT_X1
+            cuts.append(B(x0, x1, bar_y1 - EPS, ch_y[-1] - SLOT_W / 2 - EPS,
+                          FLOOR_TOP, TOWER_TOP + EPS))
+    else:
+        # --- 印刷最適化: レースウェイ全体を埋め、必要な配線経路だけを
+        #     細いダクト（THIN_DUCT_Z の高さのみ）で確保する。内部の
+        #     大きな空洞を減らし、印刷時の天井ブリッジ量を削減する ---
+        dz0, dz1 = THIN_DUCT_Z
+        # x- タワー: ch1（外部リード線）〜電源スイッチ
+        cuts.append(B(-POCK_X1, -SLOT_X1, ch1_y + SLOT_W / 2 - EPS,
+                      switch_cy + SWITCH_WIRE_W / 2, dz0, dz1))
+        # x+ タワー: ch3（外部リード線）〜ケース接合部（右トンネルへ）
+        cuts.append(B(SLOT_X1, POCK_X1, ch3_y + SLOT_W / 2 - EPS,
+                      bar_y1 - EPS, dz0, dz1))
 
     # --- フォークプロング固定スリット（左右タワー×各チャンネル）---
     for cy in ch_y:
@@ -427,14 +441,17 @@ def build_speaker_lid(speaker_cy):
 # ----------------------------------------------------------------------------
 # メイン
 # ----------------------------------------------------------------------------
-def build_case(main_body, others, with_speaker):
-    bar, cuts, info = build_bar(with_speaker)
+def build_case(main_body, others, with_speaker, optimized=False):
+    bar, cuts, info = build_bar(with_speaker, optimized=optimized)
 
-    tunnels = [B(TUNNEL_XL[0], TUNNEL_XL[1], TUNNEL_Y[0], TUNNEL_Y[1],
-                 TUNNEL_Z[0], TUNNEL_Z[1])]
-    if with_speaker:
-        tunnels.append(B(TUNNEL_XR[0], TUNNEL_XR[1], TUNNEL_Y[0], TUNNEL_Y[1],
-                         TUNNEL_Z[0], TUNNEL_Z[1]))
+    # ch1(x-)・ch3(x+) の外部リード線は必ずどちらかのトンネルへ抜ける必要が
+    # あるため、電源スイッチ/スピーカーの有無にかかわらず左右とも常設する
+    tunnels = [
+        B(TUNNEL_XL[0], TUNNEL_XL[1], TUNNEL_Y[0], TUNNEL_Y[1],
+          TUNNEL_Z[0], TUNNEL_Z[1]),
+        B(TUNNEL_XR[0], TUNNEL_XR[1], TUNNEL_Y[0], TUNNEL_Y[1],
+          TUNNEL_Z[0], TUNNEL_Z[1]),
+    ]
 
     fused = diff(union([main_body, bar]), cuts + tunnels)
     out = trimesh.util.concatenate([fused] + list(others))
@@ -457,6 +474,13 @@ if __name__ == '__main__':
     out.export('stl/case_3AAA_basic.stl')
     print(f'  size = {np.round(out.extents,2).tolist()}')
     print('  channels Y =', [round(y, 2) for y in info['ch_y']])
+
+    out_opt, fused_opt, info_opt = build_case(main_body, others,
+                                              with_speaker=False, optimized=True)
+    print('basic (print-optimized, no raceway): watertight =',
+          fused_opt.is_watertight, 'tris =', len(fused_opt.faces))
+    out_opt.export('stl/case_3AAA_basic_optimized.stl')
+    print(f'  size = {np.round(out_opt.extents,2).tolist()}')
 
     out2, fused2, info2 = build_case(main_body, others, with_speaker=True)
     print('speaker: watertight =', fused2.is_watertight, 'tris =', len(fused2.faces))
